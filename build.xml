@@ -1,4 +1,4 @@
-<project name="tp-final-algo3" basedir="." default="test">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="tp-final-algo3" basedir="." default="test">
 	<property name="build" location="build" />
 	<property name="libs" location="libs" />
 	<property name="classes.dir" location="build" />
@@ -12,6 +12,13 @@
 	<property name="coverage.summaryxml.dir" location="${reports.dir}/cobertura-summary-xml" />
 	<property name="coverage.html.dir" location="${reports.dir}/cobertura-html" />
 
+  <!-- Ivy customization -->
+  <property name="ivy.install.version" value="2.2.0"/>
+  <property name="ivy.jar.dir" value="${libs}/"/>
+  <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar"/>
+  <!-- End of 'Ivy customization -->
+
+
 	<path id="classpath">
 		<fileset dir="${libs}">
 			<include name="*.jar" />
@@ -23,7 +30,7 @@
 
 	<path id="cobertura.classpath">
 		<fileset dir="${cobertura.dir}">
-			<include name="cobertura.jar" />
+      <include name="cobertura-1.9.4.1.jar" />
 			<include name="*.jar" />
 		</fileset>
 	</path>
@@ -35,7 +42,7 @@
 		<mkdir dir="${build}/tests"/>
 	</target>
 
-	<target name="compilar.aplicacion" depends="setup">
+	<target name="compilar.aplicacion" depends="setup, resolve">
 		<javac srcdir="src" destdir="${build}" includeantruntime="false" debug="yes" target="1.6">
 		</javac>
 	</target>
@@ -71,11 +78,11 @@
 		</junitreport>
 	</target>
 
-	<taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
 
 	<target name="instrumentar.aplicacion" depends="compilar.aplicacion, init">
 		<delete file="${build}/cobertura.ser"/>					
 		<delete dir="${instrumented.dir}" />
+	  <taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
 		<cobertura-instrument todir="${instrumented.dir}" datafile="${build}/cobertura.ser">
 			<ignore regex="org.apache.log4j.*" />
 			<fileset dir="${classes.dir}">
@@ -132,6 +139,29 @@
 	</target>
 
 	<target name="integracion-continua" depends="coverage-report" description="Ejecuta todas las tareas de integracion y genera los correspondientes reportes"/>
+
+  <!-- Ivy installation -->
+  <target name="download-ivy" unless="skip.download">
+    <mkdir dir="${ivy.jar.dir}"/>
+    <!-- download Ivy from web site so that it can be used even 
+         without any special installation -->
+    <echo message="installing ivy..."/>
+    <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" dest="${ivy.jar.file}" usetimestamp="true"/>
+  </target>
+
+  <target name="install-ivy" depends="download-ivy" description="--> install ivy">
+    <path id="ivy.lib.path">
+    <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+    </path>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+  </target>
+  <!-- End of 'Ivy installation -->
+
+  <!-- Resolve dependencies -->
+  <target name="resolve" depends="install-ivy" description="--> retrieve dependencies with ivy">
+    <ivy:retrieve pattern="${libs}/[artifact]-[type]-[revision].[ext]"/>
+  </target>
+  <!-- End of 'Resolve dependencies -->
 
 
 </project>
