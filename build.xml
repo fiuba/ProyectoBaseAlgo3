@@ -1,0 +1,137 @@
+<project name="tp-final-algo3" basedir="." default="test">
+	<property name="build" location="build" />
+	<property name="libs" location="libs" />
+	<property name="classes.dir" location="build" />
+	<property name="instrumented.dir" location="${build}/instrumented" />
+	<property name="cobertura.dir" location="${libs}" />
+	<property name="reports.dir" location="${build}/reports" />
+	<property name="reports.xml.dir" location="${reports.dir}/junit-xml" />
+	<property name="reports.html.dir" location="${reports.dir}/junit-html" />
+	<property name="src.dir" location="src" />
+	<property name="coverage.xml.dir" location="${reports.dir}/cobertura-xml" />
+	<property name="coverage.summaryxml.dir" location="${reports.dir}/cobertura-summary-xml" />
+	<property name="coverage.html.dir" location="${reports.dir}/cobertura-html" />
+
+	<path id="classpath">
+		<fileset dir="${libs}">
+			<include name="*.jar" />
+		</fileset>
+		<pathelement location="${build}" />
+		<pathelement location="${instrumented.dir}" />
+		<pathelement location="${build}/tests" />
+	</path>
+
+	<path id="cobertura.classpath">
+		<fileset dir="${cobertura.dir}">
+			<include name="cobertura.jar" />
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="setup">
+		<delete dir="${build}" />
+		<mkdir dir="${build}"/>
+		<mkdir dir="${build}/classes"/>
+		<mkdir dir="${build}/tests"/>
+	</target>
+
+	<target name="compilar.aplicacion" depends="setup">
+		<javac srcdir="src" destdir="${build}" includeantruntime="false" debug="yes" target="1.6">
+		</javac>
+	</target>
+	
+	<target name="compilar.tests" depends="instrumentar.aplicacion">
+		<javac srcdir="test" destdir="${build}/tests" includeantruntime="false" debug="yes" target="1.6">
+			<classpath refid="classpath" />
+		</javac>
+	</target>
+
+
+	<target name="ejecutar.tests" depends="compilar.tests">
+		<junit fork="yes" failureProperty="test.failure"  forkmode="once">
+			<!-- <classpath refid="classpath" /> -->
+			<sysproperty key="net.sourceforge.cobertura.datafile"
+					file="${build}/cobertura.ser" />
+			<classpath location="${instrumented.dir}" />
+			<classpath location="${build}" />
+			<classpath refid="cobertura.classpath" />
+			<classpath refid="classpath" />
+			<formatter type="xml" />
+			<test name="${testcase}" todir="${reports.xml.dir}" if="testcase" />
+			<batchtest todir="${reports.xml.dir}" unless="testcase">
+				<fileset dir="${build}/tests" includes="**/*Test.class" />
+			</batchtest>
+		</junit>
+		<fail message="Pruebas fallidas" if="test.failure" />
+		<junitreport todir="${reports.xml.dir}">
+			<fileset dir="${reports.xml.dir}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${reports.html.dir}" />
+		</junitreport>
+	</target>
+
+	<taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
+
+	<target name="instrumentar.aplicacion" depends="compilar.aplicacion, init">
+		<delete file="${build}/cobertura.ser"/>					
+		<delete dir="${instrumented.dir}" />
+		<cobertura-instrument todir="${instrumented.dir}" datafile="${build}/cobertura.ser">
+			<ignore regex="org.apache.log4j.*" />
+			<fileset dir="${classes.dir}">
+				<include name="**/*.class" />
+				<exclude name="**/*Test.class" />
+			</fileset>
+		</cobertura-instrument>
+	</target>
+
+	<target name="init">
+		<mkdir dir="${instrumented.dir}" />
+		<mkdir dir="${reports.xml.dir}" />
+		<mkdir dir="${reports.html.dir}" />
+	</target>
+
+	<target name="coverage-check">
+		<cobertura-check branchrate="34" totallinerate="100" />
+	</target>
+
+	<target name="coverage-report" depends="ejecutar.tests">
+		<cobertura-report srcdir="${src.dir}" destdir="${coverage.xml.dir}" format="xml" datafile="${build}/cobertura.ser" />
+	</target>
+
+	<target name="summary-coverage-report">
+		<cobertura-report srcdir="${src.dir}" destdir="${coverage.summaryxml.dir}" format="summaryXml" datafile="${build}/cobertura.ser" />
+	</target>
+
+	<target name="alternate-coverage-report">
+		<cobertura-report destdir="${coverage.html.dir}" datafile="${build}/cobertura.ser">
+			<fileset dir="${src.dir}">
+				<include name="**/*.java"/>
+			</fileset>
+		</cobertura-report>
+	</target>
+
+	<taskdef resource="checkstyletask.properties" classpath="${libs}/checkstyle-5.5-all.jar"/>
+
+	<target name="checkstyle" description="Generates a report of code convention violations.">
+  		<checkstyle config="${libs}/sun_checks.xml"
+              failureProperty="checkstyle.failure"
+              failOnViolation="false">
+	    	<fileset dir="src" includes="**/*.java"/>
+  		</checkstyle>
+	</target>
+
+	<target name="test" depends="ejecutar.tests, coverage-report, alternate-coverage-report" description="Compile, instrument ourself, run the tests and generate JUnit and coverage reports."/>
+
+	<target name="compilar.paquete" depends="test">
+		<javac srcdir="src" destdir="${build}/classes" debug="no"></javac>
+	</target>
+
+	<target name="empaquetar" depends="compilar.paquete">
+		<jar destfile="${build}/dist/titiritero.jar" basedir="${build}/classes"/>
+	</target>
+
+	<target name="integracion-continua" depends="coverage-report" description="Ejecuta todas las tareas de integracion y genera los correspondientes reportes"/>
+
+
+</project>
