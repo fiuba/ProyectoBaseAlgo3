@@ -1,0 +1,12 @@
+<ivy-module version="2.0">
+    <info organisation="org.apache" module="tp-final-algo3"/>
+    <dependencies>
+        <dependency org="asm" name="asm" rev="3.3.1"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="5.5"/>
+        <dependency org="org.mockito" name="mockito-all" rev="1.9.0"/>
+        <dependency org="oro" name="oro" rev="2.0.8"/>
+        <dependency org="junit" name="junit" rev="4.10"/>
+        <dependency org="log4j" name="log4j" rev="1.2.9"/>
+        <dependency org="net.sourceforge.cobertura" name="cobertura" rev="1.9.4.1"/>
+    </dependencies>
+</ivy-module>
