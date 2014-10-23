@@ -18,6 +18,9 @@
   <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar"/>
   <!-- End of 'Ivy customization -->
 
+  <!-- For those who are behind a proxy you may add the line bellow 
+  <setproxy proxyhost="proxy.domain.x.y" proxyport="8080" proxypassword="passwd" proxyuser="userid"/>
+  --!>
 
 	<path id="classpath">
 		<fileset dir="${libs}">
