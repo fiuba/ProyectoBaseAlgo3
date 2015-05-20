@@ -1,4 +1,4 @@
-<project xmlns:ivy="antlib:org.apache.ivy.ant" name="tp-final-algo3" basedir="." default="test">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="tp-final-algo3" basedir="." default="integracion-continua">
 	<property name="build" location="build" />
 	<property name="libs" location="libs" />
 	<property name="classes.dir" location="build" />
@@ -45,12 +45,12 @@
 	</target>
 
 	<target name="compilar.aplicacion" depends="setup, resolve">
-		<javac srcdir="src" destdir="${build}" includeantruntime="false" debug="yes" target="1.6">
+		<javac srcdir="src" destdir="${build}" includeantruntime="false" debug="yes" target="1.7">
 		</javac>
 	</target>
 	
 	<target name="compilar.tests" depends="instrumentar.aplicacion">
-		<javac srcdir="test" destdir="${build}/tests" includeantruntime="false" debug="yes" target="1.6">
+		<javac srcdir="test" destdir="${build}/tests" includeantruntime="false" debug="yes" target="1.7">
 			<classpath refid="classpath" />
 		</javac>
 	</target>

@@ -10,7 +10,14 @@ public class FooTest {
         Foo foo = new Foo();
         String result = foo.doFoo();
         Assert.assertEquals("Foo", result);
-
 	}
+	
+	@Test
+	public void doBarShouldReturnBar(){
+        Foo foo = new Foo();
+        String result = foo.doBar();
+        Assert.assertEquals("Bar", result);
+	}
+	
 
 }
