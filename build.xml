@@ -140,7 +140,7 @@
 		<jar destfile="${build}/dist/titiritero.jar" basedir="${build}/classes"/>
 	</target>
 
-	<target name="integracion-continua" depends="coverage-report" description="Ejecuta todas las tareas de integracion y genera los correspondientes reportes"/>
+	<target name="integracion-continua" depends="coverage-report,alternate-coverage-report" description="Ejecuta todas las tareas de integracion y genera los correspondientes reportes"/>
 
   <!-- Ivy installation -->
   <target name="download-ivy" unless="skip.download">
