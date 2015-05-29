@@ -4,6 +4,7 @@
 	<property name="classes.dir" location="build" />
 	<property name="instrumented.dir" location="${build}/instrumented" />
 	<property name="cobertura.dir" location="${libs}" />
+	<property name="pmd.dir" location="${libs}/analysis" />
 	<property name="reports.dir" location="${build}/reports" />
 	<property name="reports.xml.dir" location="${reports.dir}/junit-xml" />
 	<property name="reports.html.dir" location="${reports.dir}/junit-html" />
@@ -37,6 +38,12 @@
 		</fileset>
 	</path>
 
+	<path id="pmd.classpath">
+		<fileset dir="${pmd.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	
 	<target name="setup">
 		<delete dir="${build}" />
 		<mkdir dir="${build}" />
@@ -58,7 +65,6 @@
 
 	<target name="ejecutar.tests" depends="compilar.tests">
 		<junit fork="yes" failureProperty="test.failure" forkmode="once">
-			<!-- <classpath refid="classpath" /> -->
 			<sysproperty key="net.sourceforge.cobertura.datafile" file="${build}/cobertura.ser" />
 			<classpath location="${instrumented.dir}" />
 			<classpath location="${build}" />
@@ -130,7 +136,7 @@
 		<jar destfile="${build}/dist/titiritero.jar" basedir="${build}/classes" />
 	</target>
 
-	<target name="integracion-continua" depends="coverage-report,alternate-coverage-report" description="Ejecuta todas las tareas de integracion y genera los correspondientes reportes"/>
+	<target name="integracion-continua" depends="run-pmd,coverage-report,alternate-coverage-report" description="Ejecuta todas las tareas de integracion y genera los correspondientes reportes"/>
 
 	<!-- Ivy installation -->
 	<target name="download-ivy" unless="skip.download">
@@ -151,13 +157,15 @@
 
 	<!-- Resolve dependencies -->
 	<target name="resolve" depends="install-ivy" description="--> retrieve dependencies with ivy">
-		<ivy:retrieve pattern="${libs}/[artifact]-[type]-[revision].[ext]" />
+		<ivy:retrieve conf="build" pattern="${libs}/[artifact]-[type]-[revision].[ext]" />
+		<ivy:retrieve conf="analysis" pattern="${libs}/analysis/[artifact](-[classifier]).[ext]"/>	
+		
 	</target>
 	<!-- End of 'Resolve dependencies -->
 
-	<target name="pmd">
+	<target name="run-pmd">
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" >
-			<classpath refid="classpath" />
+			<classpath refid="pmd.classpath" />
 		</taskdef>
 		<pmd shortFilenames="true">
 			<ruleset>rulesets/favorites.xml</ruleset>
