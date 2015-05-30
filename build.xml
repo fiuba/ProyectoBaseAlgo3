@@ -163,7 +163,7 @@
 	</target>
 	<!-- End of 'Resolve dependencies -->
 
-	<target name="run-pmd">
+	<target name="run-pmd" depends="setup, resolve">
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" >
 			<classpath refid="pmd.classpath" />
 		</taskdef>
