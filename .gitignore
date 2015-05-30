@@ -7,3 +7,4 @@ tmp/
 .settings/
 bin/
 build.xml.old
+*.jar
