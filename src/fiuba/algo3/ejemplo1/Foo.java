@@ -16,4 +16,13 @@ public class Foo {
 	public String doBar() {
 		return "Bar";
 	}
+
+	public int doLoop() {
+				int x = 1;
+		for (int i=1; i< 3; i++) {
+			x++;
+		}
+		return x;
+	}
+
 }
