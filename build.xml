@@ -1,4 +1,4 @@
-<project xmlns:ivy="antlib:org.apache.ivy.ant" name="tp-final-algo3" basedir="." default="integracion-continua">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="nicopaez.tutoriales.oo.notas" basedir="." default="test">
 	<property name="build" location="build" />
 	<property name="libs" location="libs" />
 	<property name="classes.dir" location="build" />
@@ -49,6 +49,7 @@
 		<mkdir dir="${build}" />
 		<mkdir dir="${build}/classes" />
 		<mkdir dir="${build}/tests" />
+        <mkdir dir="${reports.dir}" />
 	</target>
 
 	<target name="compilar.aplicacion" depends="setup, resolve">
@@ -62,29 +63,11 @@
 		</javac>
 	</target>
 
-
-	<target name="ejecutar.tests" depends="compilar.tests">
-		<junit fork="yes" failureProperty="test.failure" forkmode="once">
-			<sysproperty key="net.sourceforge.cobertura.datafile" file="${build}/cobertura.ser" />
-			<classpath location="${instrumented.dir}" />
-			<classpath location="${build}" />
-			<classpath refid="cobertura.classpath" />
-			<classpath refid="classpath" />
-			<formatter type="xml" />
-			<test name="${testcase}" todir="${reports.xml.dir}" if="testcase" />
-			<batchtest todir="${reports.xml.dir}" unless="testcase">
-				<fileset dir="${build}/tests" includes="**/*Test.class" />
-			</batchtest>
-		</junit>
-		<fail message="Pruebas fallidas" if="test.failure" />
-		<junitreport todir="${reports.xml.dir}">
-			<fileset dir="${reports.xml.dir}">
-				<include name="TEST-*.xml" />
-			</fileset>
-			<report format="frames" todir="${reports.html.dir}" />
-		</junitreport>
-	</target>
-
+    <target name="compilar.tests.sin.instrumentar" depends="compilar.aplicacion">
+        <javac srcdir="test" destdir="${build}/tests" includeantruntime="false" debug="yes" target="1.7">
+            <classpath refid="classpath" />
+        </javac>
+    </target>
 
 	<target name="instrumentar.aplicacion" depends="compilar.aplicacion, init">
 		<delete file="${build}/cobertura.ser" />
@@ -98,6 +81,29 @@
 			</fileset>
 		</cobertura-instrument>
 	</target>
+
+
+    <target name="ejecutar.tests" depends="compilar.tests">
+        <junit fork="yes" failureProperty="test.failure" forkmode="once" showoutput="true">
+            <sysproperty key="net.sourceforge.cobertura.datafile" file="${build}/cobertura.ser" />
+            <classpath location="${instrumented.dir}" />
+            <classpath location="${build}" />
+            <classpath refid="cobertura.classpath" />
+            <classpath refid="classpath" />
+            <formatter type="xml" />
+            <test name="${testcase}" todir="${reports.xml.dir}" if="testcase" />
+            <batchtest todir="${reports.xml.dir}" unless="testcase">
+                <fileset dir="${build}/tests" includes="**/*Test.class" />
+            </batchtest>
+        </junit>
+        <fail message="Pruebas fallidas" if="test.failure" />
+        <junitreport todir="${reports.xml.dir}">
+            <fileset dir="${reports.xml.dir}">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report format="frames" todir="${reports.html.dir}" />
+        </junitreport>
+    </target>
 
 	<target name="init">
 		<mkdir dir="${instrumented.dir}" />
@@ -125,9 +131,19 @@
 		</cobertura-report>
 	</target>
 
-	<target name="test" depends="ejecutar.tests, coverage-report, alternate-coverage-report" description="Compile, instrument ourself, run the tests and generate JUnit and coverage reports." />
+    <target name="test" depends="compilar.tests.sin.instrumentar">
+        <junit fork="no" failureProperty="test.failure" showoutput="true">
+            <classpath location="${build}" />
+            <classpath refid="classpath" />
+            <batchtest todir="${reports.xml.dir}" unless="testcase">
+                <fileset dir="${build}/tests" includes="**/*Test.class" />
+                <formatter type="plain" usefile="false"/>
+            </batchtest>
+        </junit>
+    </target>
 
-	<target name="compilar.paquete" depends="test">
+
+    <target name="compilar.paquete" depends="test">
 		<javac srcdir="src" destdir="${build}/classes" debug="no">
 		</javac>
 	</target>
@@ -171,7 +187,8 @@
 			<ruleset>rulesets/favorites.xml</ruleset>
 			<ruleset>basic</ruleset>
 			<ruleset>imports</ruleset>
-			<formatter type="html" toFile="pmd_report.html" linkPrefix="http://pmd.sourceforge.net/xref/" toConsole="true"/>
+			<formatter type="html" toFile="${reports.dir}/pmd.html" linkPrefix="http://pmd.sourceforge.net/xref/" toConsole="true"/>
+            <formatter type="xml" toFile="${reports.dir}/pmd.xml" linkPrefix="http://pmd.sourceforge.net/xref/" toConsole="false"/>
 			<fileset dir="src">
 				<include name="**/*.java" />
 			</fileset>
