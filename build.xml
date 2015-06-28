@@ -149,7 +149,7 @@
 	</target>
 
 	<target name="empaquetar" depends="compilar.paquete">
-		<jar destfile="${build}/dist/titiritero.jar" basedir="${build}/classes" />
+		<jar destfile="${build}/dist/algo3.jar" basedir="${build}/classes" />
 	</target>
 
 	<target name="integracion-continua" depends="run-pmd,coverage-report,alternate-coverage-report" description="Ejecuta todas las tareas de integracion y genera los correspondientes reportes"/>
@@ -193,6 +193,21 @@
 				<include name="**/*.java" />
 			</fileset>
 		</pmd>
+	</target>
+
+
+		<target name="empaquetar.con.imagenes" depends="compilar.paquete">
+			<copydir src="src/gui/imagess"
+				dest="${build}/classes/gui/imagess"
+				includes="**/*.png"/>
+		<jar destfile="${build}/dist/algo3.jar" basedir="${build}/classes"/>
+	</target>
+
+	<target name="ejecutar.aplicacion" depends="empaquetar">
+		<java classname="fiuba.algo3.ejemplo1.Foo" fork="true">
+			<classpath refid="classpath" />
+			<classpath location="${build}/dist/algo3.jar" />
+		</java>
 	</target>
 
 </project>
