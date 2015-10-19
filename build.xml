@@ -94,6 +94,7 @@
             <test name="${testcase}" todir="${reports.xml.dir}" if="testcase" />
             <batchtest todir="${reports.xml.dir}" unless="testcase">
                 <fileset dir="${build}/tests" includes="**/*Test.class" />
+                <fileset dir="${build}/tests" includes="**/Prueba*.class" />
             </batchtest>
         </junit>
         <fail message="Pruebas fallidas" if="test.failure" />
