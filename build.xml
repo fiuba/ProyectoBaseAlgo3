@@ -1,4 +1,4 @@
-<project xmlns:ivy="antlib:org.apache.ivy.ant" name="nicopaez.tutoriales.oo.notas" basedir="." default="test">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="fiuba.algo3.javafx.Program" basedir="." default="test">
 	<property name="build" location="build" />
 	<property name="libs" location="libs" />
 	<property name="classes.dir" location="build" />
@@ -58,13 +58,13 @@
 	</target>
 
 	<target name="compilar.tests" depends="instrumentar.aplicacion">
-		<javac srcdir="test" destdir="${build}/tests" includeantruntime="false" debug="yes" target="1.7">
+		<javac srcdir="test" destdir="${build}/tests" includeantruntime="false" debug="yes" target="1.8">
 			<classpath refid="classpath" />
 		</javac>
 	</target>
 
     <target name="compilar.tests.sin.instrumentar" depends="compilar.aplicacion">
-        <javac srcdir="test" destdir="${build}/tests" includeantruntime="false" debug="yes" target="1.7">
+        <javac srcdir="test" destdir="${build}/tests" includeantruntime="false" debug="yes" target="1.8">
             <classpath refid="classpath" />
         </javac>
     </target>
@@ -197,7 +197,7 @@
 	</target>
 
 
-		<target name="empaquetar.con.imagenes" depends="compilar.paquete">
+	<target name="empaquetar.con.imagenes" depends="compilar.paquete">
 			<copydir src="src/gui/imagess"
 				dest="${build}/classes/gui/imagess"
 				includes="**/*.png"/>
@@ -205,9 +205,9 @@
 	</target>
 
 	<target name="ejecutar.aplicacion" depends="empaquetar">
-		<java classname="fiuba.algo3.ejemplo1.Foo" fork="true">
+		<java classname="fiuba.algo3.javafx.Program" fork="true">
 			<classpath refid="classpath" />
-			<classpath location="${build}/dist/algo3.jar" />
+			<!--<classpath location="${build}/dist/algo3.jar" />-->
 		</java>
 	</target>
 
