@@ -142,6 +142,7 @@
                 <formatter type="plain" usefile="false"/>
             </batchtest>
         </junit>
+        <fail message="Pruebas fallidas" if="test.failure" />
     </target>
 
 
